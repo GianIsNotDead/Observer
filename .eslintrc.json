@@ -1,0 +1,15 @@
+{
+    "parserOptions": {
+        "ecmaVersion": 6
+    },
+    "env": {
+        "browser": true,
+        "jquery": true
+    },
+    "globals": {
+        "cordova": true
+    },
+    "rules": {
+        "no-console": "warn"
+    }
+}
