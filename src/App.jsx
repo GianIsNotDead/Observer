@@ -2,11 +2,14 @@ import React, { Component } from 'react';
 
 // Component
 import Console from './Console';
+import Channel from './Channel';
 
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      deviceCharacteristic: null,
+      channelCharacteristic: null,
       data: JSON.stringify([
         {
           device_id: 0x00111110,
@@ -71,7 +74,7 @@ class App extends Component {
           />
         </section>
         <section className="right-panel">
-
+          <Channel />
         </section>
       </section>
     );
