@@ -75,7 +75,9 @@ section, div {
 }
 
 .channel-status {
-  width: 30px;
+  width: 5%;
+  max-width: 50px;
+  height: 100%;
   background: #181D45;
 }
 
@@ -92,8 +94,10 @@ section, div {
 }
 
 .channel-amplitude {
+  width: 95%;
   height: 100%;
   display: flex;
+  overflow: hidden;
 }
 
 .amplitude-min-max {
@@ -117,8 +121,14 @@ section, div {
   width: 100%;
   height: 100%;
   padding: 10px 0;
+  overflow-x: scroll;
+  overflow-y: hidden;
 }
 
 .amplitude-line {
   height: 100%;
+}
+
+.amplitude-graph::-webkit-scrollbar {
+  display: none;
 }

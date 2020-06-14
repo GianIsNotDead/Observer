@@ -1,23 +1,26 @@
 import React from 'react';
 
-function Channel() {
-  let mockData = [0.5, -0.5, 1.5, -1.5, 2.5, -2.5, 3.5, -3.5, 4.5, -4.5, 5.5, -5.5, 6.5, -6.5, 7.5, -7.5, 8.5, -8.5, 9.5, -9.5,];
-  let previousValue = '';
-  let xDistance = 10;
-  let yMax = 120;
+function Channel({ mockData }) {
+  let constructedGraph = [];
+  let xLineDistance = 10;
+  let xTotalDistance = mockData.length * xLineDistance;
+  let yMax = 125;
   let yMin = 0;
   let yMid = (yMax - yMin) / 2;
-  let constructedGraph = mockData.map((a, x) => {
-    let Path = null;
-    if (x === 0) {
-      Path = (<path d={`M${x*xDistance} ${yMid} L${x*xDistance + xDistance} ${yMid - (yMid / 10 * a)}`}></path>);
+  let previousXY = `0 ${yMid}`;
+
+  if (Array.isArray(mockData)) {
+    for (let x = mockData.length - 1; x >= 0; x -= 1) {
+      let Path = null;
+      let d = mockData[x];
+      let xPos = xTotalDistance - x*xLineDistance;
+      let lineEnd = xPos - xLineDistance;
+      Path = (<path d={`M${previousXY} L${lineEnd} ${yMid - (yMid / 10 * d)}`}></path>);
+      previousXY = `${lineEnd} ${yMid - (yMid / 10 * d)}`;
+      constructedGraph.push(Path);
     }
-    if (x !== 0) {
-      Path = (<path d={`M${previousValue} L${x*xDistance + xDistance} ${yMid - (yMid / 10 * a)}`}></path>);
-    }
-    previousValue = `${x*xDistance + xDistance} ${yMid - (yMid / 10 * a)}`;
-    return Path;
-  });
+  }
+  
   return (
     <div className="channel">
       <div className="channel-status">
@@ -39,11 +42,8 @@ function Channel() {
           </svg>
         </div>
         <div className="amplitude-graph">
-          <svg xmlns="http://www.w3.org/2000/svg" className="amplitude-line" viewBox="0 0 100 125">
-            <g stroke="#CEDBFF" strokeWidth="2" fill="none">
-              {/* <path d="M0 62.5 L10 125"></path>
-              <path d="M10 125 L20 1"></path>
-              <path d="M20 1 L30 100"></path> */}
+          <svg xmlns="http://www.w3.org/2000/svg" className="amplitude-line" viewBox={`0 0 ${xTotalDistance} 125`}>
+            <g stroke="#CEDBFF" strokeWidth="1" fill="none">
               { constructedGraph }
             </g>
           </svg>

@@ -10,6 +10,7 @@ class App extends Component {
     this.state = {
       deviceCharacteristic: null,
       channelCharacteristic: null,
+      mockData: [0.5, -0.5, 1.5, -1.5, 2.5, -2.5, 3.5, -3.5, 4.5, -4.5, 5.5, -5.5, 6.5, -6.5, 7.5, -7.5, 8.5, -8.5, 9.5, -9.5,],
       data: JSON.stringify([
         {
           device_id: 0x00111110,
@@ -34,6 +35,25 @@ class App extends Component {
       ]),
     };
     this.formatConsoleData = this.formatConsoleData.bind(this);
+  }
+
+  componentDidMount() {
+    let cur = 0;
+    let cloneData = this.state.mockData;
+    let that = this;
+    setInterval(function(){
+      if (cloneData.length > 150) {
+        cloneData = cloneData.slice(75, cloneData.length);
+      }
+      let mockVoltage = Math.floor((Math.random() * 10) + 1);
+      if (cur % 2 === 0) {
+        mockVoltage = mockVoltage - 10;
+      }
+      cloneData.push(mockVoltage);
+      that.setState({ mockData: cloneData }, () => {
+        cur = cur + 1;
+      });
+    }, 100);
   }
 
   /**
@@ -74,7 +94,7 @@ class App extends Component {
           />
         </section>
         <section className="right-panel">
-          <Channel />
+          <Channel mockData={this.state.mockData} />
         </section>
       </section>
     );
