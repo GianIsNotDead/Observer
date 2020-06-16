@@ -1,6 +1,6 @@
 import React from 'react';
 
-function Channel({ mockData }) {
+function Channel({ channelNumber, mockData }) {
   let constructedGraph = [];
   let xLineDistance = 10;
   let xTotalDistance = mockData.length * xLineDistance;
@@ -11,21 +11,22 @@ function Channel({ mockData }) {
 
   if (Array.isArray(mockData)) {
     for (let x = mockData.length - 1; x >= 0; x -= 1) {
-      let Path = null;
+      let Line = null;
       let d = mockData[x];
       let xPos = xTotalDistance - x*xLineDistance;
+      let yPos = yMid - (yMid / 10 * d);
       let lineEnd = xPos - xLineDistance;
-      Path = (<path d={`M${previousXY} L${lineEnd} ${yMid - (yMid / 10 * d)}`}></path>);
+      Line = (<path d={`M${previousXY} L${lineEnd} ${yMid - (yMid / 10 * d)}`}></path>);
       previousXY = `${lineEnd} ${yMid - (yMid / 10 * d)}`;
-      constructedGraph.push(Path);
+      constructedGraph.push(Line);
     }
   }
-  
+
   return (
     <div className="channel">
       <div className="channel-status">
         <div className="channel-status-wrapper">
-          <p className="channel-number">CH 1</p>
+          <p className="channel-number">CH {channelNumber}</p>
         </div>
       </div>
       <div className="channel-amplitude">
@@ -43,7 +44,7 @@ function Channel({ mockData }) {
         </div>
         <div className="amplitude-graph">
           <svg xmlns="http://www.w3.org/2000/svg" className="amplitude-line" viewBox={`0 0 ${xTotalDistance} 125`}>
-            <g stroke="#CEDBFF" strokeWidth="1" fill="none">
+            <g stroke="#CEDBFF" strokeWidth="1.5" fill="none">
               { constructedGraph }
             </g>
           </svg>

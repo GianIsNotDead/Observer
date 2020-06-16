@@ -28,12 +28,17 @@ section, div {
   position: relative;
 }
 
+button, button:active {
+  outline: none;
+  text-decoration: none;
+}
+
 /************************
         Pannel
 ************************/
 .panel-container {
   min-width: 1080px;
-  min-height: 768px;
+  min-height: 800px;
   display: flex;
 }
 
@@ -43,12 +48,15 @@ section, div {
 }
 
 .left-panel {
+  display: flex;
+  flex-direction: column;
   width: 33%;
   background: #202441;
 }
 
 .right-panel {
   width: 67%;
+  overflow-y: scroll;
   background: #26294A;
 }
 
@@ -57,21 +65,40 @@ section, div {
 ************************/
 .console {
   width: 100%;
+  height: 92%;
   padding: 15px;
   color: #FFFFFF;
 }
 
 /************************
+        Control
+************************/
+.controls {
+  background: #2C325A;
+  width: 100%;
+  height: 8%;
+  padding: 10px;
+}
+.start-btn {
+  width: 33%;
+  height: 100%;
+  border-radius: 90px;
+}
+
+/************************
         Channel
 ************************/
-
 .channel {
   width: 100%;
   height: 12.5%;
-  min-height: 125px;
+  min-height: 100px;
   display: flex;
   color: #FFFFFF;
   border-bottom: 1px solid #5E639E;
+}
+
+.channel:last-of-type {
+  border-bottom: none;
 }
 
 .channel-status {

@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 // Component
 import Console from './Console';
 import Channel from './Channel';
+import Controls from './Controls';
 
 class App extends Component {
   constructor(props) {
@@ -33,27 +34,36 @@ class App extends Component {
           bias_p: true
         },
       ]),
+      // UI state
+      ampGraphXPosition: 0,
+      ampGraphYPosition: 0,
+      ampValue: 0,
     };
+    this.handleButtonPress = this.handleButtonPress.bind(this);
+    this.getAmpGraphXYPosition = this.getAmpGraphXYPosition.bind(this);
+    this.toggleElement = this.toggleElement.bind(this);
     this.formatConsoleData = this.formatConsoleData.bind(this);
   }
 
-  componentDidMount() {
-    let cur = 0;
-    let cloneData = this.state.mockData;
-    let that = this;
-    setInterval(function(){
-      if (cloneData.length > 150) {
-        cloneData = cloneData.slice(75, cloneData.length);
-      }
-      let mockVoltage = Math.floor((Math.random() * 10) + 1);
-      if (cur % 2 === 0) {
-        mockVoltage = mockVoltage - 10;
-      }
-      cloneData.push(mockVoltage);
-      that.setState({ mockData: cloneData }, () => {
-        cur = cur + 1;
-      });
-    }, 100);
+  handleButtonPress(btn) {
+    console.log('button pressed');
+    fetch('http://localhost:3000/')
+      .then(response => console.log(response));
+  }
+
+  getAmpGraphXYPosition(newXPosition, newYPosition) {
+    this.setState({
+      ampGraphXPosition: newXPosition,
+      ampGraphYPosition: newYPosition,
+    });
+  }
+
+  toggleElement(stateProperty) {
+    let newState = false;
+    if (this.state[stateProperty] === newState) {
+      let newState = true;
+    }
+    this.setState({ [stateProperty]: newState });
   }
 
   /**
@@ -84,6 +94,25 @@ class App extends Component {
     return formatedData;
   }
 
+  componentDidMount() {
+    let cur = 0;
+    let cloneData = this.state.mockData;
+    let that = this;
+    setInterval(function(){
+      if (cloneData.length > 250) {
+        cloneData = cloneData.slice(100, cloneData.length);
+      }
+      let mockVoltage = Math.floor((Math.random() * 10) + 1);
+      if (cur % 2 === 0) {
+        mockVoltage = mockVoltage - 10;
+      }
+      cloneData.push(mockVoltage);
+      that.setState({ mockData: cloneData }, () => {
+        cur = cur + 1;
+      });
+    }, 100);
+  }
+
   render() {
     return (
       <section className="panel-container">
@@ -92,9 +121,78 @@ class App extends Component {
             data={this.state.data}
             formatConsoleData={this.formatConsoleData}
           />
+          <Controls
+            handleButtonPress={this.handleButtonPress}
+          />
         </section>
         <section className="right-panel">
-          <Channel mockData={this.state.mockData} />
+          <Channel
+            channelNumber="1"
+            mockData={this.state.mockData}
+            displayPointCircle={this.state.displayPointCircle}
+            toggleElement={this.toggleElement}
+            getMouseXPosition={this.getMouseXPosition}
+            mouseXPosition={this.state.mouseXPosition}
+            getAmpGraphXPosition={this.getAmpGraphXYPosition}
+            ampGraphXPosition={this.state.ampGraphXPosition}
+            ampGraphYPosition={this.state.ampGraphYPosition}
+          />
+          <Channel
+            channelNumber="2"
+            mockData={this.state.mockData}
+            displayPointCircle={this.state.displayPointCircle}
+            toggleElement={this.toggleElement}
+            getMouseXPosition={this.getMouseXPosition}
+            mouseXPosition={this.state.mouseXPosition}
+          />
+          <Channel
+            channelNumber="3"
+            mockData={this.state.mockData}
+            displayPointCircle={this.state.displayPointCircle}
+            toggleElement={this.toggleElement}
+            getMouseXPosition={this.getMouseXPosition}
+            mouseXPosition={this.state.mouseXPosition}
+          />
+          <Channel
+            channelNumber="4"
+            mockData={this.state.mockData}
+            displayPointCircle={this.state.displayPointCircle}
+            toggleElement={this.toggleElement}
+            getMouseXPosition={this.getMouseXPosition}
+            mouseXPosition={this.state.mouseXPosition}
+          />
+          <Channel
+            channelNumber="5"
+            mockData={this.state.mockData}
+            displayPointCircle={this.state.displayPointCircle}
+            toggleElement={this.toggleElement}
+            getMouseXPosition={this.getMouseXPosition}
+            mouseXPosition={this.state.mouseXPosition}
+          />
+          <Channel
+            channelNumber="6"
+            mockData={this.state.mockData}
+            displayPointCircle={this.state.displayPointCircle}
+            toggleElement={this.toggleElement}
+            getMouseXPosition={this.getMouseXPosition}
+            mouseXPosition={this.state.mouseXPosition}
+          />
+          <Channel
+            channelNumber="7"
+            mockData={this.state.mockData}
+            displayPointCircle={this.state.displayPointCircle}
+            toggleElement={this.toggleElement}
+            getMouseXPosition={this.getMouseXPosition}
+            mouseXPosition={this.state.mouseXPosition}
+          />
+          <Channel
+            channelNumber="8"
+            mockData={this.state.mockData}
+            displayPointCircle={this.state.displayPointCircle}
+            toggleElement={this.toggleElement}
+            getMouseXPosition={this.getMouseXPosition}
+            mouseXPosition={this.state.mouseXPosition}
+          />
         </section>
       </section>
     );
