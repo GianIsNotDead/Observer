@@ -26,8 +26,7 @@ fastify.get('/dist/*', (request, reply) => {
 
 // Serve data from serial port
 fastify.get('/device-data', (request,reply) => {
-  console.log('getting device data ......');
-  portData.getData('device-data')
+  portData.requestData('device-data')
     .then(data => reply.send(data));
 });
 
