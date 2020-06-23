@@ -12,28 +12,7 @@ class App extends Component {
       deviceCharacteristic: null,
       channelCharacteristic: null,
       mockData: [0.5, -0.5, 1.5, -1.5, 2.5, -2.5, 3.5, -3.5, 4.5, -4.5, 5.5, -5.5, 6.5, -6.5, 7.5, -7.5, 8.5, -8.5, 9.5, -9.5,],
-      data: JSON.stringify([
-        {
-          device_id: 0x00111110,
-          data_rate: 250,
-          clock: 'internal',
-          reference: 'internal'
-        },
-        {
-          ch_number: 1,
-          mode: 'single ended',
-          driver: 'p',
-          bias_n: true,
-          bias_p: true
-        },
-        {
-          ch_number: 2,
-          mode: 'single ended',
-          driver: 'p',
-          bias_n: true,
-          bias_p: true
-        },
-      ]),
+      deviceData: {},
       // UI state
       ampGraphXPosition: 0,
       ampGraphYPosition: 0,
@@ -43,6 +22,7 @@ class App extends Component {
     this.getAmpGraphXYPosition = this.getAmpGraphXYPosition.bind(this);
     this.toggleElement = this.toggleElement.bind(this);
     this.formatConsoleData = this.formatConsoleData.bind(this);
+    this.generateDemoData = this.generateDemoData.bind(this);
   }
 
   handleButtonPress(btn) {
@@ -94,7 +74,7 @@ class App extends Component {
     return formatedData;
   }
 
-  componentDidMount() {
+  generateDemoData() {
     let cur = 0;
     let cloneData = this.state.mockData;
     let that = this;
@@ -113,12 +93,18 @@ class App extends Component {
     }, 100);
   }
 
+  componentDidMount() {
+    fetch(`http://localhost:3000/device-data`)
+      .then(response => response.text())
+      .then(deviceData => this.setState({ deviceData }));
+  }
+
   render() {
     return (
       <section className="panel-container">
         <section className="left-panel">
           <Console
-            data={this.state.data}
+            deviceData={this.state.deviceData}
             formatConsoleData={this.formatConsoleData}
           />
           <Controls

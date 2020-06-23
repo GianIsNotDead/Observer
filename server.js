@@ -1,11 +1,13 @@
 const fs = require('fs');
+
+const portData = require('./lib/serial_read');
+
 const fastify = require('fastify')({
   logger: true
 });
 
 // Serve static files
 fastify.get('/', (request, reply) => {
-  // reply.send({ hello: 'world' });
   const stream = fs.createReadStream('./index.html')
   reply.type('text/html').send(stream)
 });
@@ -23,6 +25,11 @@ fastify.get('/dist/*', (request, reply) => {
 });
 
 // Serve data from serial port
+fastify.get('/device-data', (request,reply) => {
+  console.log('getting device data ......');
+  portData.getData('device-data')
+    .then(data => reply.send(data));
+});
 
 // Run the server!
 fastify.listen(3000, (err, address) => {

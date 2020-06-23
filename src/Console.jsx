@@ -1,10 +1,9 @@
 import React from 'react';
 
-function Console({ data, formatConsoleData }) {
-  let d = formatConsoleData(data);
+function Console({ deviceData, formatConsoleData }) {
   return (
     <div className="console">
-      <p>{ d }</p>
+      <p>{ formatConsoleData(deviceData) }</p>
     </div>
   );
 }
