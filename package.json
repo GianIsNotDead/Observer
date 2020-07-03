@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "webpack --config webpack/webpack.prod.js",
-    "dev": "webpack --config webpack/webpack.dev.js -w"
+    "dev": "webpack --config webpack/webpack.dev.js -w",
+    "terminal": "node lib/serial_read.js"
   },
   "author": "Gian",
   "license": "ISC",
