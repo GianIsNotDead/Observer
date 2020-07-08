@@ -1,10 +1,7 @@
 const fs = require('fs');
-
-const portData = require('./lib/serial_read');
-
-const fastify = require('fastify')({
-  logger: true
-});
+const fastify = require('fastify')({ logger: true });
+const { fork } = require('child_process');
+const path = require('path');
 
 // Serve static files
 fastify.get('/', (request, reply) => {
@@ -24,14 +21,8 @@ fastify.get('/dist/*', (request, reply) => {
   reply.type(fileType).send(stream);
 });
 
-// Serve data from serial port
-fastify.get('/device-data', (request,reply) => {
-  portData.requestData('device-data')
-    .then(data => reply.send(data));
-});
-
-// Run the server!
 fastify.listen(3000, (err, address) => {
   if (err) throw err
-  fastify.log.info(`server listening on ${address}`)
+  fastify.log.info(`server listening on ${address}`);
+  fork(path.resolve('lib/webSocket.js'));
 });

@@ -12,7 +12,7 @@ class App extends Component {
       deviceCharacteristic: null,
       channelCharacteristic: null,
       mockData: [0.5, -0.5, 1.5, -1.5, 2.5, -2.5, 3.5, -3.5, 4.5, -4.5, 5.5, -5.5, 6.5, -6.5, 7.5, -7.5, 8.5, -8.5, 9.5, -9.5,],
-      deviceData: {},
+      deviceData: null,
       // UI state
       ampGraphXPosition: 0,
       ampGraphYPosition: 0,
@@ -21,14 +21,19 @@ class App extends Component {
     this.handleButtonPress = this.handleButtonPress.bind(this);
     this.getAmpGraphXYPosition = this.getAmpGraphXYPosition.bind(this);
     this.toggleElement = this.toggleElement.bind(this);
-    this.formatConsoleData = this.formatConsoleData.bind(this);
     this.generateDemoData = this.generateDemoData.bind(this);
   }
 
   handleButtonPress(btn) {
-    console.log('button pressed');
-    fetch('http://localhost:3000/')
-      .then(response => console.log(response));
+    let ws = new WebSocket('ws://localhost:9001');
+    ws.addEventListener('open', () => ws.send('hello'));
+    ws.addEventListener('message', (msg) => {
+      let { data } = msg;
+      if (data.match(/device-data/g) !== null) {
+        let deviceData = data.substring(data.indexOf('{'), data.length - 1);
+        this.setState({ deviceData });
+      }
+    });
   }
 
   getAmpGraphXYPosition(newXPosition, newYPosition) {
@@ -44,34 +49,6 @@ class App extends Component {
       let newState = true;
     }
     this.setState({ [stateProperty]: newState });
-  }
-
-  /**
-   * @param {string} data
-   * @returns {string}
-   * @description format string data from the serial port
-  */
-  formatConsoleData(data) {
-    let formatedData = '';
-    for (let i = 0; i < data.length; i += 1) {
-      // concat all alphabet charaters, numbers and spaces and colons
-      if (data[i].match(/([A-Za-z1-9]|"|\s|_)/) !== null) {
-        formatedData = formatedData.concat(data[i]);
-      }
-      if (data[i] === '{') {
-        formatedData = formatedData.concat(data[i]).concat('\n    ');
-      }
-      if (data[i] === '}') {
-        formatedData = formatedData.concat('\n').concat(data[i]).concat('\n\n');
-      }
-      if (data[i] === ',' && data[i + 1] !== '{') {
-        formatedData = formatedData.concat(data[i]).concat('\n    ');
-      }
-      if (data[i] === ':') {
-        formatedData = formatedData.concat(data[i]).concat(' ');
-      }
-    }
-    return formatedData;
   }
 
   generateDemoData() {
@@ -92,13 +69,7 @@ class App extends Component {
       });
     }, 100);
   }
-
-  componentDidMount() {
-    fetch(`http://localhost:3000/device-data`)
-      .then(response => response.text())
-      .then(deviceData => this.setState({ deviceData }));
-  }
-
+  
   render() {
     return (
       <section className="panel-container">
