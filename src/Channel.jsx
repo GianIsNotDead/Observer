@@ -1,23 +1,23 @@
 import React from 'react';
 
-function Channel({ channelNumber, mockData }) {
+function Channel({ channelNumber, eegData}) {
   let constructedGraph = [];
   let xLineDistance = 10;
-  let xTotalDistance = mockData.length * xLineDistance;
+  let xTotalDistance = eegData.length * xLineDistance;
   let yMax = 125;
   let yMin = 0;
   let yMid = (yMax - yMin) / 2;
   let previousXY = `0 ${yMid}`;
 
-  if (Array.isArray(mockData)) {
-    for (let x = mockData.length - 1; x >= 0; x -= 1) {
+  if (Array.isArray(eegData)) {
+    for (let x = eegData.length - 1; x >= 0; x -= 1) {
       let Line = null;
-      let d = mockData[x];
+      let d = eegData[x];
       let xPos = xTotalDistance - x*xLineDistance;
       let yPos = yMid - (yMid / 10 * d);
       let lineEnd = xPos - xLineDistance;
-      Line = (<path d={`M${previousXY} L${lineEnd} ${yMid - (yMid / 10 * d)}`}></path>);
-      previousXY = `${lineEnd} ${yMid - (yMid / 10 * d)}`;
+      Line = (<path d={`M${previousXY} L${lineEnd} ${yPos}`}></path>);
+      previousXY = `${lineEnd} ${yPos}`;
       constructedGraph.push(Line);
     }
   }
