@@ -1,9 +1,15 @@
 import React from 'react';
 
 function Channel({ channelNumber, eegData}) {
+  console.log('channel number: ', channelNumber, ' eeg data: ', eegData);
   let constructedGraph = [];
-  let xLineDistance = 10;
+  // X axis spacing
+  let xLineDistance = 5;
+  // Y axis height division, i.e 10 means the positive and negative coordinates are divided in to 10 points.
+  let yScale = 200;
+  // Width of the graph container
   let xTotalDistance = eegData.length * xLineDistance;
+  // Height of the graph container
   let yMax = 125;
   let yMin = 0;
   let yMid = (yMax - yMin) / 2;
@@ -12,9 +18,9 @@ function Channel({ channelNumber, eegData}) {
   if (Array.isArray(eegData)) {
     for (let x = eegData.length - 1; x >= 0; x -= 1) {
       let Line = null;
-      let d = eegData[x];
-      let xPos = xTotalDistance - x*xLineDistance;
-      let yPos = yMid - (yMid / 10 * d);
+      let data = eegData[x];
+      let xPos = xTotalDistance - (x * xLineDistance);
+      let yPos = yMid - (yMid / yScale * data);
       let lineEnd = xPos - xLineDistance;
       Line = (<path d={`M${previousXY} L${lineEnd} ${yPos}`}></path>);
       previousXY = `${lineEnd} ${yPos}`;
@@ -31,8 +37,8 @@ function Channel({ channelNumber, eegData}) {
       </div>
       <div className="channel-amplitude">
         <div className="amplitude-min-max">
-          <p className="amplitude-max">10 uV</p>
-          <p className="amplitude-min">-10 uV</p>
+          <p className="amplitude-max">{`${yScale} mV`}</p>
+          <p className="amplitude-min">{`${0 - yScale} mV`}</p>
         </div>
         <div className="graph-y-line">
           <svg xmlns="http://www.w3.org/2000/svg" className="y-line" viewBox="0 0 6 125">

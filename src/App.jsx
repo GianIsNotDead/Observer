@@ -11,7 +11,6 @@ class App extends Component {
     this.ws = null;
     this.state = {
       wsOpened: false,
-      mockData: [0.5, -0.5, 1.5, -1.5, 2.5, -2.5, 3.5, -3.5, 4.5, -4.5, 5.5, -5.5, 6.5, -6.5, 7.5, -7.5, 8.5, -8.5, 9.5, -9.5,],
       // { total_channels, data_rate, clock, reference, bias_enabled, test_passed }
       deviceData: null,
       eegData: [],
@@ -23,7 +22,6 @@ class App extends Component {
     this.handleButtonPress = this.handleButtonPress.bind(this);
     this.getAmpGraphXYPosition = this.getAmpGraphXYPosition.bind(this);
     this.toggleElement = this.toggleElement.bind(this);
-    this.generateDemoData = this.generateDemoData.bind(this);
   }
 
   handleButtonPress() {
@@ -46,25 +44,6 @@ class App extends Component {
     this.setState({ [stateProperty]: newState });
   }
 
-  generateDemoData() {
-    let cur = 0;
-    let cloneData = this.state.mockData;
-    let that = this;
-    setInterval(function(){
-      if (cloneData.length > 250) {
-        cloneData = cloneData.slice(100, cloneData.length);
-      }
-      let mockVoltage = Math.floor((Math.random() * 10) + 1);
-      if (cur % 2 === 0) {
-        mockVoltage = mockVoltage - 10;
-      }
-      cloneData.push(mockVoltage);
-      that.setState({ mockData: cloneData }, () => {
-        cur = cur + 1;
-      });
-    }, 100);
-  }
-
   componentWillUnmount() {
     this.ws.removeEventListener('open');
     this.ws.removeEventListener('message');
@@ -74,6 +53,7 @@ class App extends Component {
   componentDidMount() {
     this.ws = new WebSocket('ws://localhost:9001');
     this.ws.addEventListener('open', () => this.setState({ wsOpened: true }));
+    this.ws.addEventListener('close', () => console.log('web socket closed'));
     this.ws.addEventListener('message', (msg) => {
       let { data } = msg;
       if (data.match(/device-data/g) !== null) {
@@ -88,9 +68,13 @@ class App extends Component {
           // TODO: Display in uV scale
           eegData[n].push(d * 1000);
         });
-        this.setState({ eegData });
+        this.setState({ eegData }, () => {
+          // Reduce memory load.
+          if (eegData[0].length < 250) return;
+          let newData = eegData.map(d => d.slice(150, d.length));
+          this.setState({ eegData: newData });
+        });
       }
-      console.log('this.state.eegData: ', this.state.eegData);
     });
   }
 
@@ -98,7 +82,7 @@ class App extends Component {
     let ChannelComp = null;
     if (this.state.eegData.length !== 0) {
       ChannelComp = this.state.eegData.map((d, n) => {
-        return (<Channel channelNumber={n + 1} eegData={d}/>);
+        return (<Channel channelNumber={n + 1} eegData={d} />);
       });
     }
     return (
