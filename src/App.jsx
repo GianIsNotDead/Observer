@@ -15,18 +15,16 @@ class App extends Component {
       deviceData: null,
       eegData: [],
       // UI state
+      yScale: 20,
       ampGraphXPosition: 0,
       ampGraphYPosition: 0,
       ampValue: 0,
     };
-    this.handleButtonPress = this.handleButtonPress.bind(this);
     this.getAmpGraphXYPosition = this.getAmpGraphXYPosition.bind(this);
     this.toggleElement = this.toggleElement.bind(this);
-  }
-
-  handleButtonPress() {
-    console.log('handling button press......');
-    this.ws.send(' ');
+    this.scaleYAxis = this.scaleYAxis.bind(this);
+    this.handleButtonPress = this.handleButtonPress.bind(this);
+    this.lowPassFilter = this.lowPassFilter.bind(this);
   }
 
   getAmpGraphXYPosition(newXPosition, newYPosition) {
@@ -44,6 +42,32 @@ class App extends Component {
     this.setState({ [stateProperty]: newState });
   }
 
+  // Y axis height division, i.e 10 means the positive and negative coordinates are divided in to 10 points.
+  scaleYAxis() {
+    let { yScale, eegData } = this.state;
+    let scaleFactor = 0.2;
+    let yScaleCompare = eegData.length === 0 ? yScale : Math.abs(eegData[0][eegData.length - 1]);
+    console.log('Scalling y axis: ', yScale, ' yScaleCompare: ', yScaleCompare);
+    if (yScaleCompare > yScale) {
+      console.log('larger +++++++++++');
+      this.setState({ yScale: Math.ceil(yScale + (scaleFactor * yScaleCompare)) });
+    } else if ((scaleFactor * yScaleCompare + yScaleCompare) < yScale) {
+      console.log('smaller ------------');
+      this.setState({ yScale: Math.ceil(yScale - (scaleFactor * yScaleCompare)) })
+    }
+  }
+
+  handleButtonPress() {
+    console.log('handling button press......');
+    this.ws.send(' ');
+  }
+
+  lowPassFilter(samples, cutoff, sampleRate) {
+    let rc = 1.0 / (cutoff * 2 * Math.PI);
+    let dt = 1.0 / sampleRate;
+    let alpha = dt / (rc + dt);
+  }
+
   componentWillUnmount() {
     this.ws.removeEventListener('open');
     this.ws.removeEventListener('message');
@@ -51,6 +75,7 @@ class App extends Component {
   }
   
   componentDidMount() {
+    // TODO: check connection status, and re-establish connection if necessary
     this.ws = new WebSocket('ws://localhost:9001');
     this.ws.addEventListener('open', () => this.setState({ wsOpened: true }));
     this.ws.addEventListener('close', () => console.log('web socket closed'));
@@ -69,9 +94,11 @@ class App extends Component {
           eegData[n].push(d * 1000);
         });
         this.setState({ eegData }, () => {
+          console.log('eegData: ', eegData);
+          this.scaleYAxis();
           // Reduce memory load.
-          if (eegData[0].length < 250) return;
-          let newData = eegData.map(d => d.slice(150, d.length));
+          if (eegData[0].length < 180) return;
+          let newData = eegData.map(d => d.slice(30, d.length));
           this.setState({ eegData: newData });
         });
       }
@@ -82,7 +109,7 @@ class App extends Component {
     let ChannelComp = null;
     if (this.state.eegData.length !== 0) {
       ChannelComp = this.state.eegData.map((d, n) => {
-        return (<Channel channelNumber={n + 1} eegData={d} />);
+        return (<Channel channelNumber={n + 1} eegData={d} yScale={this.state.yScale} scaleYAxis={this.scaleYAxis} />);
       });
     }
     return (

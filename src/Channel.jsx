@@ -1,12 +1,9 @@
 import React from 'react';
 
-function Channel({ channelNumber, eegData}) {
-  console.log('channel number: ', channelNumber, ' eeg data: ', eegData);
+function Channel({ channelNumber, eegData, yScale }) {
   let constructedGraph = [];
   // X axis spacing
-  let xLineDistance = 5;
-  // Y axis height division, i.e 10 means the positive and negative coordinates are divided in to 10 points.
-  let yScale = 200;
+  let xLineDistance = 3;
   // Width of the graph container
   let xTotalDistance = eegData.length * xLineDistance;
   // Height of the graph container
