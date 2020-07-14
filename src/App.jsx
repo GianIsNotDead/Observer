@@ -49,11 +49,9 @@ class App extends Component {
     let yScaleCompare = eegData.length === 0 ? yScale : Math.abs(eegData[0][eegData.length - 1]);
     console.log('Scalling y axis: ', yScale, ' yScaleCompare: ', yScaleCompare);
     if (yScaleCompare > yScale) {
-      console.log('larger +++++++++++');
       this.setState({ yScale: Math.ceil(yScale + (scaleFactor * yScaleCompare)) });
     } else if ((scaleFactor * yScaleCompare + yScaleCompare) < yScale) {
-      console.log('smaller ------------');
-      this.setState({ yScale: Math.ceil(yScale - (scaleFactor * yScaleCompare)) })
+      this.setState({ yScale: Math.ceil(yScale - (scaleFactor * yScaleCompare)) });
     }
   }
 
