@@ -60,6 +60,7 @@ class App extends Component {
     this.ws.send(' ');
   }
 
+  // TODO: complete filter for main's noise interference
   lowPassFilter(samples, cutoff, sampleRate) {
     let rc = 1.0 / (cutoff * 2 * Math.PI);
     let dt = 1.0 / sampleRate;
