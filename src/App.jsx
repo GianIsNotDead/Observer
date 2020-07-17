@@ -43,9 +43,10 @@ class App extends Component {
     this.setState({ [stateProperty]: newState });
   }
 
-  handleButtonPress() {
-    console.log('handling button press......');
-    this.ws.send(' ');
+  handleButtonPress(btn) {
+    let command = btn.target.name;
+    console.log('This is command: ', command);
+    this.ws.send(command);
   }
 
   debounceData(t) {
@@ -89,20 +90,24 @@ class App extends Component {
   }
 
   componentWillUnmount() {
-    this.ws.removeEventListener('open');
-    this.ws.removeEventListener('message');
-    this.ws.close();
+    if (this.state.wsOpened === true) this.ws.close();
   }
   
   componentDidMount() {
     // TODO: check connection status, and re-establish connection if necessary
     this.ws = new WebSocket('ws://localhost:9001');
-    this.ws.addEventListener('open', () => this.setState({ wsOpened: true }));
-    this.ws.addEventListener('close', () => console.log('web socket closed'));
+    this.ws.addEventListener('open', () => {
+      console.log('socket opened');
+      this.setState({ wsOpened: true });
+    });
+    this.ws.addEventListener('close', () => {
+      this.setState({ wsOpened: false });
+    });
     // Incoming Data
     let processMessage = this.debounceData(1000);
     this.ws.addEventListener('message', (msg) => {
       let { data } = msg;
+      console.log('This is data');
       if (data.match(/device-data/g) !== null) {
         let deviceData = data.substring(data.indexOf('{'), data.length - 1);
         this.setState({ deviceData });

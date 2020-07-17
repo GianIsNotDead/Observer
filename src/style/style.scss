@@ -79,10 +79,11 @@ button, button:active {
   height: 8%;
   padding: 10px;
 }
-.start-btn {
-  width: 33%;
+.start-btn, .stop-btn {
+  width: 30%;
   height: 100%;
   border-radius: 90px;
+  margin-right: 3%;
 }
 
 /************************
