@@ -3,7 +3,7 @@ import React from 'react';
 function Channel({ channelNumber, eegData, yScale }) {
   let constructedGraph = [];
   // X axis spacing
-  let xLineDistance = 3;
+  let xLineDistance = 6;
   // Width of the graph container
   let xTotalDistance = eegData.length * xLineDistance;
   // Height of the graph container
