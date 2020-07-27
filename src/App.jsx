@@ -24,7 +24,7 @@ class App extends Component {
     this.getAmpGraphXYPosition = this.getAmpGraphXYPosition.bind(this);
     this.toggleElement = this.toggleElement.bind(this);
     this.handleButtonPress = this.handleButtonPress.bind(this);
-    this.debounceData = this.debounceData.bind(this);
+    this.processEEGData = this.processEEGData.bind(this);
     this.lowPassFilter = this.lowPassFilter.bind(this);
   }
 
@@ -49,37 +49,28 @@ class App extends Component {
     this.ws.send(command);
   }
 
-  debounceData(t) {
-    let container = [];
-    // |
-    // |  Closure function, set state at a predefined interval
-    // v
-    return (data) => {
-      // [ 0.013317, 0.013315, 0.013334, 0.013325, 0.013315, 0.013324, 0.013323 ]
-      let eegStream = JSON.parse(data)[1].val;
-      eegStream.forEach((d, idx) => {
-        if (container[idx] === undefined) {
-          container[idx] = [];
-          this.setState({ yScale: this.state.yScale.concat(200) });
-        }
-        // free memory
-        let mV = d * 1000;
-        // value in mV scale
-        container[idx].push(mV);
+  processEEGData(data) {
+    let { eegData } = this.state
+    // Manage memory
+    if (eegData[0] !== undefined && eegData[0].length > 204) {
+      eegData = eegData.map((d, idx) => {
+        let { yScale } = this.state;
+        yScale[idx] = d.slice(d.length - 68, d.length).reduce((acc, cur) => Math.ceil(Math.max(acc, cur)));
+        this.setState({ yScale });
+        return d.slice(d.length - 170, d.length);
       });
-      setTimeout(() => {
-        this.setState({ eegData: container }, () => {
-          if (container[0].length > 204) {
-            container = container.map((c, idx) => {
-              let { yScale } = this.state;
-              yScale[idx] = c.slice(c.length - 68, c.length).reduce((acc, cur) => Math.ceil(Math.max(acc, cur)));
-              this.setState({ yScale });
-              return c.slice(c.length - 170, c.length);
-            });
-          }
-        });
-      }, t);
-    };
+    }
+    let eegStream = data.val;
+    eegStream.forEach((d, idx) => {
+      if (eegData[idx] === undefined) {
+        eegData[idx] = [];
+        this.setState({ yScale: this.state.yScale.concat(200) });
+      }
+      // value in mV scale
+      let mV = d * 1000;
+      eegData[idx].push(mV);
+    });
+    this.setState({ eegData });
   }
 
   // TODO: complete filter for main's noise interference
@@ -104,17 +95,16 @@ class App extends Component {
       this.setState({ wsOpened: false });
     });
     // Incoming Data
-    let processMessage = this.debounceData(1000);
     this.ws.addEventListener('message', (msg) => {
       let { data } = msg;
-      console.log('This is data');
-      if (data.match(/device-data/g) !== null) {
-        let deviceData = data.substring(data.indexOf('{'), data.length - 1);
-        this.setState({ deviceData });
-      }
-      if (data.match(/eeg/g) !== null) {
-        processMessage(data);
-      }
+      JSON.parse(data).forEach(d => {
+        if (d[0].match(/device-data/g) !== null) {
+          this.setState({ deviceData: JSON.stringify(d[1]) });
+        }
+        if (d[0].match(/eeg/g) !== null) {
+          this.processEEGData(d[1]);
+        }
+      });
     });
   }
 
