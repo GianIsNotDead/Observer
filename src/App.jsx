@@ -55,7 +55,7 @@ class App extends Component {
     if (eegData[0] !== undefined && eegData[0].length > 204) {
       eegData = eegData.map((d, idx) => {
         let { yScale } = this.state;
-        yScale[idx] = d.slice(d.length - 68, d.length).reduce((acc, cur) => Math.ceil(Math.max(acc, cur)));
+        yScale[idx] = d.slice(d.length - 68, d.length).reduce((acc, cur) => Math.ceil(Math.max(Math.abs(acc), Math.abs(cur))));
         this.setState({ yScale });
         return d.slice(d.length - 170, d.length);
       });
