@@ -19,7 +19,7 @@ function Channel({ channelNumber, eegData, yScale }) {
       let xPos = xTotalDistance - (x * xLineDistance);
       let yPos = yMid - (yMid / yScale * data);
       let lineEnd = xPos - xLineDistance;
-      Line = (<path d={`M${previousXY} L${lineEnd} ${yPos}`}></path>);
+      Line = (<path d={`M${previousXY} L${lineEnd} ${yPos}`} key={`line${x}`}></path>);
       previousXY = `${lineEnd} ${yPos}`;
       constructedGraph.push(Line);
     }

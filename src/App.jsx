@@ -97,8 +97,9 @@ class App extends Component {
     // Incoming Data
     this.ws.addEventListener('message', (msg) => {
       let { data } = msg;
+      console.log('data: ', data);
       JSON.parse(data).forEach(d => {
-        if (d[0].match(/device-data/g) !== null) {
+        if (d[0].match(/device/g) !== null) {
           this.setState({ deviceData: JSON.stringify(d[1]) });
         }
         if (d[0].match(/eeg/g) !== null) {
@@ -112,7 +113,7 @@ class App extends Component {
     let ChannelComp = null;
     if (this.state.eegData.length !== 0) {
       ChannelComp = this.state.eegData.map((d, n) => {
-        return (<Channel channelNumber={n + 1} eegData={d} yScale={this.state.yScale[n]} />);
+        return (<Channel channelNumber={n + 1} eegData={d} yScale={this.state.yScale[n]} key={`channel${n}`} />);
       });
     }
     return (
