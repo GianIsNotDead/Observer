@@ -61,6 +61,20 @@ button, button:active {
 }
 
 /************************
+        Ports
+************************/
+.ports {
+  background: #2C325A;
+  width: 100%;
+  height: 8%;
+  padding: 10px;
+}
+
+.ports .current-port {
+  color: #FFFFFF;
+}
+
+/************************
         Console
 ************************/
 .console {

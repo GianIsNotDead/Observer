@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 
 // Component
+import Ports from './Ports';
 import Console from './Console';
 import Channel from './Channel';
 import Controls from './Controls';
@@ -17,22 +18,13 @@ class App extends Component {
       eegData: [],
       // UI state
       yScale: [],
-      ampGraphXPosition: 0,
-      ampGraphYPosition: 0,
-      ampValue: 0,
+      togglePortSelection: false,
+      ports: null,
     };
-    this.getAmpGraphXYPosition = this.getAmpGraphXYPosition.bind(this);
     this.toggleElement = this.toggleElement.bind(this);
     this.handleButtonPress = this.handleButtonPress.bind(this);
     this.processEEGData = this.processEEGData.bind(this);
     this.lowPassFilter = this.lowPassFilter.bind(this);
-  }
-
-  getAmpGraphXYPosition(newXPosition, newYPosition) {
-    this.setState({
-      ampGraphXPosition: newXPosition,
-      ampGraphYPosition: newYPosition,
-    });
   }
 
   toggleElement(stateProperty) {
@@ -88,8 +80,8 @@ class App extends Component {
     // TODO: check connection status, and re-establish connection if necessary
     this.ws = new WebSocket('ws://localhost:9001');
     this.ws.addEventListener('open', () => {
-      console.log('socket opened');
       this.setState({ wsOpened: true });
+      this.ws.send('get_port');
     });
     this.ws.addEventListener('close', () => {
       this.setState({ wsOpened: false });
@@ -97,8 +89,10 @@ class App extends Component {
     // Incoming Data
     this.ws.addEventListener('message', (msg) => {
       let { data } = msg;
-      console.log('data: ', data);
       JSON.parse(data).forEach(d => {
+        if (d[0].match(/ports/g) !== null) {
+          this.setState({ ports: d[1] });
+        }
         if (d[0].match(/device/g) !== null) {
           this.setState({ deviceData: JSON.stringify(d[1]) });
         }
@@ -119,6 +113,11 @@ class App extends Component {
     return (
       <section className="panel-container">
         <section className="left-panel">
+          <Ports
+            ports={this.state.ports}
+            togglePortSelection={this.state.togglePortSelection}
+            toggleElement={this.toggleElement}
+          />
           <Console
             deviceData={this.state.deviceData}
             formatConsoleData={this.formatConsoleData}
