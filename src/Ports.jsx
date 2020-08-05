@@ -2,7 +2,15 @@ import React from 'react';
 
 function Ports({ ports, selectedPort, togglePortSelection, toggleElement, handleButtonPress }) {
   const PortsComp = ports !== null ? ports.map((p, idx) => (
-    <button className="available-port" key={`port-btn-${idx}`} onClick={handleButtonPress} name={`selected_port:${p.path}`}>{p.path}</button>
+    <button
+      className="available-port"
+      onClick={(event) => {
+        handleButtonPress(event);
+        toggleElement('togglePortSelection');
+      }}
+      name={`selected_port:${p.path}`}
+      key={`port-btn-${idx}`}
+    >{p.path}</button>
   )) : null;
   return (
     <div className="ports">
