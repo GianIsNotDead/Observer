@@ -18,8 +18,10 @@ class App extends Component {
       eegData: [],
       // UI state
       yScale: [],
+      // Ports
       togglePortSelection: false,
       ports: null,
+      selectedPort: null,
     };
     this.toggleElement = this.toggleElement.bind(this);
     this.handleButtonPress = this.handleButtonPress.bind(this);
@@ -37,7 +39,10 @@ class App extends Component {
 
   handleButtonPress(btn) {
     let command = btn.target.name;
-    console.log('This is command: ', command);
+    // Allow device command once the port is selected
+    if (this.state.selectedPort === null && command.match(/selected_port/g) === null) {
+      return this.setState({ deviceData: 'Please select a port' });
+    }
     this.ws.send(command);
   }
 
@@ -93,6 +98,10 @@ class App extends Component {
         if (d[0].match(/ports/g) !== null) {
           this.setState({ ports: d[1] });
         }
+        if (d[0].match(/selected_port/g) !== null) {
+          this.setState({ selectedPort: d[1] });
+          console.log(this.state);
+        }
         if (d[0].match(/device/g) !== null) {
           this.setState({ deviceData: JSON.stringify(d[1]) });
         }
@@ -115,8 +124,10 @@ class App extends Component {
         <section className="left-panel">
           <Ports
             ports={this.state.ports}
+            selectedPort={this.state.selectedPort}
             togglePortSelection={this.state.togglePortSelection}
             toggleElement={this.toggleElement}
+            handleButtonPress={this.handleButtonPress}
           />
           <Console
             deviceData={this.state.deviceData}
